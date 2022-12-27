@@ -74,25 +74,42 @@ async def ursina_tree(self):
         tree_levels.append(temp_cone)
         new_y = new_y - base_size
         base_size = base_size + reduction_cons
-
-    ed = ursina.EditorCamera()
-    merry_chrisis_colors = [colors.chrimu_green, colors.chrimu_green, colors.chrimu_blue]
-    if False:
-        for w in range(1):
-            for i, l in enumerate(tree_levels):
-                circ = Utils.circle_coords(l.x,l.y,l.radius)
-                limit = (len(circ)-1)
-                def delimit(val : int) -> int:
-                    return val if val < limit else val-limit
-                poper = delimit(i)
+    rounds = 8
+    tree_levels.reverse()
+    for w in range(rounds):
+        for i, l in enumerate(tree_levels):
+            if i>=len(tree_levels)-2: break
+            circ = Utils.circle_coords(l.x,l.z,l.radius)
+            limit = (len(circ)-1)
+            followup = True
+            if (i >= len(tree_levels)-3):
+                odds = [True]
+                for _a_ in (range(i-3) if i>3 else range(i)): odds.append(False)
+                # print(odds)
+                followup = random.choice(odds)
+            if followup:
+                def delimit(val : int) -> int: return val if val < limit else val-limit
+                val = int(w*(limit/rounds))+((1+limit%20)*i)
+                poper = delimit(val)
                 x, z = circ[poper]
-                sph_color = random.choice(merry_chrisis_colors)
-    ground = u.Entity(model='plane', scale=64, texture='white_cube', texture_scale=(32,32), collider='box')
-    sky = u.Sky(texture="sky_sunset")
+                sph_color = random.choice(colors.merry_chrisis_sphere_choices)
+                # lait = u.PointLight(x=x,y=l.y, z=z, color = sph_color*.5,
+                # shadows=True)
+                lait = u.Entity(model='quad', texture='radial_gradient', x=x, y=l.y, z=z, 
+                                billboard=True, color=sph_color, render_queue=1, alpha=.5)
+                sfir = chrimu_sfir(0, pos=[x,l.y,z], color = sph_color)
+                sfir.rad = 1
+                g_lights.append(lait)
+                g_spheres.append(sfir)
+
+    # Real Scene
+    ground = u.Entity(model='plane', scale=64, texture='grass', color=u.color.gray, texture_scale=(32,32), collider='box', shader=lit_with_shadows_shader)
+    # sky = u.Sky(texture="sky_sunset")
     ed = u.EditorCamera()
     ed.y = ed.y+10
     # ed.z = ed.z-200
     app.run()
+
 
 asyncio.run(ursina_tree(0))
 #terrain_from_heightmap_texture = u.Entity(model=u.Terrain('heightmap_1', skip=8), scale=(40,5,20), texture='heightmap_1')
