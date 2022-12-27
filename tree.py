@@ -21,6 +21,9 @@ test_path = mypath().lower().startswith("C:\\Users\\inicio".lower())
 global fps
 fps = 60
 
+global res_w
+global res_h
+
 global step
 global items
 global g_lights
@@ -177,13 +180,15 @@ class MehTree():
         return geometry
         
     def __init__(self, previous : UrsinaUltimateTree = None) -> None:
+        global res_w
+        global res_h
         self.ursina = False
         origin_w = int(self.get_curr_screen_geometry().split("x")[0])
         origin_h = int(self.get_curr_screen_geometry().split("x")[1].split("+")[0])
-        w = origin_w * 0.60
-        h = origin_h * 0.60
-        print(f"Working with canvas size: {origin_w} x 0.60={w}, {origin_h} x 0.60={h}")
-        self.scene = canvas(width=w, height=h,background=color.black, 
+        res_w = origin_w * 0.60
+        res_h = origin_h * 0.60
+        print(f"Working with canvas size: W:({origin_w} x 0.60 = {res_w}) x H:({origin_h} x 0.60 = {res_h})")
+        self.scene = canvas(width=res_w, height=res_h,background=color.black, 
         # I  just want to have my own style for the site, the default one looked awful lol
         center=vector(0,10,0), ambient=color.black, title=f'''
         <div class="title"><h1 class="title">Merry Christmas, Pythonistas!</h1></div>
