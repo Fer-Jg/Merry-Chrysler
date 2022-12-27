@@ -5,6 +5,13 @@ import asyncio
 # def update():
 #     cone.rotation_y = cone.rotation_y #+ ursina.time.dt*100
 
+class myColors():
+    black = ursina.color.black
+    brown_likea_tree = ursina.color.rgb(118,92,72)
+    chrimu_green = ursina.color.rgb(35, 102, 68)
+
+colors = myColors()
+
 def make_ursina_arrows(self):
     arrow_x = ursina.Entity(model="arrow", color=ursina.color.red, x=0.5)
     arrow_y = ursina.Entity(model="arrow", color=ursina.color.blue, rotation_z=-90, y=0.5)
