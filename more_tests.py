@@ -36,7 +36,8 @@ def make_ursina_arrows(self):
     arrow_z = u.Entity(model="arrow", color=u.color.green, rotation_y=90, z=-0.5)
 
 def tree_cone(self, rad : float, y : int = 0):
-    return u.Entity(model=u.Cone(resolution=curve_res, height=rad*1.5, radius=rad), color=colors.dark_chrimu_green, y=y, shader=lit_with_shadows_shader)
+    return u.Entity(model=u.Cone(resolution=curve_res, height=rad*1.5, radius=rad), color=colors.dark_chrimu_green, y=y, 
+    texture="grass", shader=lit_with_shadows_shader)
 
 def chrimu_sfir(self, color = None, pos : List[int] = None, **kwargs):
     if pos:
@@ -45,7 +46,7 @@ def chrimu_sfir(self, color = None, pos : List[int] = None, **kwargs):
         y = pos[1]
         z = pos[2]
     else: x,y,z = 0,0,0
-    return u.Entity(model="sphere", color=color if color else myColors.angy_red, x=x, y=y, z=z, shader=lit_with_shadows_shader, **kwargs)
+    return u.Entity(model="sphere", color=color if color else myColors.angy_red, x=x, y=y, z=z, alpha=.5,shader=lit_with_shadows_shader, **kwargs)
 
 
 async def ursina_tree(self):
