@@ -7,15 +7,49 @@ from re import search as regex_find
 from re import DOTALL as DoItCool
 from time import sleep
 from tkinter import Tk
-
 from os import getcwd as mypath
-import asyncio
 
-import ursina
+
+import asyncio
+from typing import List
+import ursina as u
+from ursina.shaders import lit_with_shadows_shader
 
 # I don't want to input my FPS every time I test my program so I do this for later use (:
 test_path = mypath().lower().startswith("C:\\Users\\inicio".lower())
 fps = 60
+
+global step
+global items
+global g_lights
+global g_spheres
+global counter
+step = 0
+items = []
+g_lights = []
+g_spheres = []
+counter = 0
+
+
+class myColors():
+    black = u.color.black
+    brown_likea_tree = u.color.rgb(118,92,72)
+    dark_chrimu_green = u.color.rgb(0, 102, 0)
+    light_chrimu_green = u.color.rgb(5, 96, 15)
+    chrimu_red = u.color.rgb(193, 12, 3)
+    chrimu_blue = u.color.rgb(37, 92, 182)
+    chrimu_purple = u.color.rgb(163, 54, 198)
+    chrimu_oranga = u.color.rgb(203, 94, 1)
+    chrimu_silver = u.color.rgb(199, 199, 199)
+    chrimu_gold = u.color.rgb(208, 179, 48)
+    chrimu_magenta = u.color.rgb(203, 8, 152)
+
+    merry_chrisis_sphere_choices = [light_chrimu_green,chrimu_red,chrimu_blue,chrimu_purple,chrimu_oranga,chrimu_silver,chrimu_gold,chrimu_magenta]
+    
+    angy_red = u.color.red
+
+global colors
+colors = myColors()
 
 class Utils():
 
