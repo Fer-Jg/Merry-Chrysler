@@ -245,8 +245,8 @@ class MehTree():
                 limit = (len(coords_list)-1)
                 def delimit(val : int) -> int:
                     return val if val < limit else val-limit
-                # Just want to point out the "in [whatever]" was for something I thought before but meh, I'll leave it like that
                 poper = (delimit(int(len(coords_list)/3)+i) 
+                # Just want to point out the "in [whatever]" was for something I thought before but meh, I'll leave it like that
                         if w in [0,3] else delimit(2*int(len(coords_list)/3)+i) 
                         if w in [1,4] else delimit(3*int(len(coords_list)/3)+i))
                 # print(f"Pos {i},{w} : {limit} - {poper}") 
