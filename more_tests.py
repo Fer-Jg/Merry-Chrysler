@@ -7,9 +7,18 @@ import ursina as u
 from ursina.shaders import lit_with_shadows_shader
 import asyncio
 
-
-# def update():
-#     cone.rotation_y = cone.rotation_y #+ u.time.dt*100
+global items
+global g_lights
+global g_spheres
+items = []
+g_lights = []
+g_spheres = []
+counter = 0
+def update():
+    global counter
+    counter +=1
+    random.choice(g_lights).scale = 0 + 4 * u.sin(counter * 0.005)
+    random.choice(g_spheres).scale = 0 + 1 * u.sin(counter * 0.005)
 
 class myColors():
     black = u.color.black
