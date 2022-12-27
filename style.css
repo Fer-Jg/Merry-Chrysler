@@ -1,0 +1,20 @@
+:root{
+    --chrs-black: #190508;
+    --chrs-dark-coffee: #4F100E;
+    --chrs-light-coffee: #7F1813;
+    --chrs-red: #CB2924;
+    --green-yellow: #9AD658;
+    --chrs-greeny: #236644;
+}
+body {
+    background-color:var(--chrs-red);
+}
+div.title {
+    width: '->w<-';
+    height: inherit;
+}
+h1.title {
+    font-weight: 900;
+    color: var(--chrs-greeny);
+    text-decoration-color: var(--chrs-greeny);
+}
