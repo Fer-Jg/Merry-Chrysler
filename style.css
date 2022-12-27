@@ -9,11 +9,11 @@
 body {
     background-color:var(--chrs-red);
 }
-div.title {
+div.title, div.caption{
     width: '->w<-';
     height: inherit;
 }
-h1.title {
+h1.title, div.caption {
     font-weight: 900;
     color: var(--chrs-greeny);
     text-decoration-color: var(--chrs-greeny);
