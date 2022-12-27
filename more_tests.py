@@ -14,9 +14,18 @@ import asyncio
 class myColors():
     black = u.color.black
     brown_likea_tree = u.color.rgb(118,92,72)
-    chrimu_green = u.color.rgb(35, 102, 68)
-    chrimu_red = u.color.rgb(195, 15, 22)
-    chrimu_blue = u.color.rgb(31, 39, 102)
+    dark_chrimu_green = u.color.rgb(0, 102, 0)
+    light_chrimu_green = u.color.rgb(5, 96, 15)
+    chrimu_red = u.color.rgb(193, 12, 3)
+    chrimu_blue = u.color.rgb(37, 92, 182)
+    chrimu_purple = u.color.rgb(163, 54, 198)
+    chrimu_oranga = u.color.rgb(203, 94, 1)
+    chrimu_silver = u.color.rgb(199, 199, 199)
+    chrimu_gold = u.color.rgb(208, 179, 48)
+    chrimu_magenta = u.color.rgb(203, 8, 152)
+
+    merry_chrisis_sphere_choices = [light_chrimu_green,chrimu_red,chrimu_blue,chrimu_purple,chrimu_oranga,chrimu_silver,chrimu_gold,chrimu_magenta]
+    
     angy_red = u.color.red
 
 colors = myColors()
