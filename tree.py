@@ -16,7 +16,9 @@ import ursina as u
 from ursina.shaders import lit_with_shadows_shader
 
 # I don't want to input my FPS every time I test my program so I do this for later use (:
+global test_path
 test_path = mypath().lower().startswith("C:\\Users\\inicio".lower())
+global fps
 fps = 60
 
 global step
@@ -62,21 +64,97 @@ class Utils():
             t += stepSize
         return positions
 
-class SuperAwesomeAndComplexTree():
-    def make_tree(self, tab : int = 10) -> str:
-        built_tree = ""
-        # Leaves and branches and those pointy thingies, basically the top of the tree
-        for x in range(tab): built_tree += " "*(tab-x) + "*"*(x) + "*"*(x-1) + "\n"
-        # Log, trunk, idk what was the word in english lol
-        for x in range(int(tab/4)): built_tree += " "*(tab-1) + "*\n"
-        # Print the whole super cool and complex tree...
-        return built_tree
+class UrsinaUltimateTree():
+    def update():
+        global counter
+        counter +=1
+        random.choice(g_lights).scale = 0 + 4 * u.sin(counter * 0.005)
+        random.choice(g_spheres).scale = 0 + 1 * u.sin(counter * 0.005)
 
-    def print_tree(self, tab : int = 10) -> None:
-        to_print = self.make_tree()
-        for x in to_print:
-            print(x, end="")
-            sleep(((1/1)/(fps if fps > 100 else 100)) if not test_path else 0)
+    def make_ursina_arrows(self):
+        arrow_x = u.Entity(model="arrow", color=u.color.red, x=0.5)
+        arrow_y = u.Entity(model="arrow", color=u.color.blue, rotation_z=-90, y=0.5)
+        arrow_z = u.Entity(model="arrow", color=u.color.green, rotation_y=90, z=-0.5)
+
+    def tree_cone(self, rad : float, y : int = 0):
+        return u.Entity(model=u.Cone(resolution=curve_res, height=rad*1.5, radius=rad), color=colors.dark_chrimu_green, y=y, 
+        texture="grass", shader=lit_with_shadows_shader)
+
+    def chrimu_sfir(self, color = None, pos : List[int] = None, **kwargs):
+        if pos:
+            if len(pos) < 3: raise IndexError("`pos` arg is missing some coords, broudy")
+            x = pos[0]
+            y = pos[1]
+            z = pos[2]
+        else: x,y,z = 0,0,0
+        return u.Entity(model="sphere", color=color if color else myColors.angy_red, x=x, y=y, z=z, alpha=.5,shader=lit_with_shadows_shader, **kwargs)
+
+
+    async def ursina_tree(self):
+        global test_path
+        global step
+        global tree_levels
+        global app
+        global curve_res
+        curve_res = 400
+        
+        while step < 2: print("Waiting for step...")
+
+        app = u.Ursina()
+
+        if test_path: self.make_ursina_arrows()
+        log = u.Entity(model=u.Cylinder(resolution=curve_res, radius=.5, start=0, height=5.6, direction=(0,1,0)#)) I tested and fixed a bug in ursina's repo while doing this part LOL
+        , color_gradient=[colors.brown_likea_tree]), shader=lit_with_shadows_shader)
+        log_top = u.Entity(model=u.Cylinder(resolution=curve_res, radius=1, start=5.4, height=5.6, direction=(0,1,0)
+        , color_gradient=[colors.brown_likea_tree]), shader=lit_with_shadows_shader)
+
+        tree_bot = 0
+        new_y = 30
+        base_size = 0.5
+        reduction_cons = 1
+        tree_levels = []
+        while new_y >= tree_bot:
+            temp_cone = self.tree_cone(rad=base_size, y=new_y)
+            temp_cone.radius = base_size
+            temp_cone.rad = temp_cone.radius # in case i wanna call it this way, ok? ok
+            tree_levels.append(temp_cone)
+            new_y = new_y - base_size
+            base_size = base_size + reduction_cons
+        rounds = 8
+        tree_levels.reverse()
+        for w in range(rounds):
+            for i, l in enumerate(tree_levels):
+                if i>=len(tree_levels)-2: break
+                circ = Utils.circle_coords(l.x,l.z,l.radius)
+                limit = (len(circ)-1)
+                followup = True
+                if (i >= len(tree_levels)-3):
+                    odds = [True]
+                    for _a_ in (range(i-3) if i>3 else range(i)): odds.append(False)
+                    # print(odds)
+                    followup = random.choice(odds)
+                if followup:
+                    def delimit(val : int) -> int: return val if val < limit else val-limit
+                    val = int(w*(limit/rounds))+((1+limit%20)*i)
+                    poper = delimit(val)
+                    x, z = circ[poper]
+                    sph_color = random.choice(colors.merry_chrisis_sphere_choices)
+                    # lait = u.PointLight(x=x,y=l.y, z=z, color = sph_color*.5,
+                    # shadows=True)
+                    lait = u.Entity(model='quad', texture='radial_gradient', x=x, y=l.y, z=z, 
+                                    billboard=True, color=sph_color, render_queue=1, alpha=.5)
+                    sfir = self.chrimu_sfir(pos=[x,l.y,z], color = sph_color)
+                    sfir.rad = 1
+                    g_lights.append(lait)
+                    g_spheres.append(sfir)
+
+        # Real Scene
+        ground = u.Entity(model='plane', scale=64, texture='grass', color=u.color.gray, texture_scale=(32,32), collider='box', shader=lit_with_shadows_shader)
+        # sky = u.Sky(texture="sky_sunset")
+        ed = u.EditorCamera()
+        ed.y = ed.y+10
+        # ed.z = ed.z-200
+        app.run()
 
 
 class MehTree():
@@ -98,7 +176,7 @@ class MehTree():
         root.destroy()
         return geometry
         
-    def __init__(self) -> None:
+    def __init__(self, previous : UrsinaUltimateTree = None) -> None:
         self.ursina = False
         origin_w = int(self.get_curr_screen_geometry().split("x")[0])
         origin_h = int(self.get_curr_screen_geometry().split("x")[1].split("+")[0])
@@ -136,11 +214,11 @@ class MehTree():
 			body {{
 			    background-color:var(--chrs-red);
 			}}
-			div.title {{
+			div.title, div.caption{{
 			    width: {w};
 			    height: inherit;
 			}}
-			h1.title {{
+			h1.title, div.caption {{
 			    font-weight: 900;
 			    color: var(--chrs-greeny);
 			    text-decoration-color: var(--chrs-greeny);
@@ -201,8 +279,6 @@ class MehTree():
         y_arrow = arrow(pos=vector(0,0,0), round=True, axis=vector(0,point_size,0), shaftwidth=0.25, color=color.green)
         z_arrow = arrow(pos=vector(0,0,0), round=True, axis=vector(0,0,point_size), shaftwidth=0.25, color=color.blue)
         coords_label = label(pos=x_arrow.pos, height=16, border=4, xoffset=15, yoffset=15, text="XYZ", font="sans")
-
-        #self.scene.forward = vector(-1, -1, -1)
     
     def make_star(self):
         st = shapes.star()
@@ -213,7 +289,7 @@ class MehTree():
 
         star_light = local_light(pos=vector(star_0.pos.x,star_0.pos.y+1,star_0.pos.z), color=color.yellow)
 
-    def new_learn(self):
+    async def vpy_tree(self):
         self.make_star()
         tree_components = []
         log_top = 20
@@ -258,106 +334,46 @@ class MehTree():
                 dot_levels.append(ndot)
         itera = 0
         ursined = False
+        global step
+        print("\n\nNow look at your web browser ;)")
+        ursination = UrsinaUltimateTree()
         while True:
             rate(fps)
-            # scene.pause()
-            light_levels[itera].visible = not light_levels[itera].visible
-            dot_levels[itera].modify(0,visible = not dot_levels[itera].visible)
-            print(light_levels[itera].visible)
-            itera = itera+1 if itera+1 < len(light_levels)-1 else 0
-            # scene.pause()
+            # # scene.pause()
+            # light_levels[itera].visible = not light_levels[itera].visible
+            # dot_levels[itera].modify(0,visible = not dot_levels[itera].visible)
+            # print(light_levels[itera].visible)
+            # itera = itera+1 if itera+1 < len(light_levels)-1 else 0
+            # # scene.pause()
             if step < 2:
                 input("Done? Press enter")
                 step = 2
+                await ursination.ursina_tree()
+
+class SuperAwesomeAndComplexTree():
+
+    def make_tree(self, previous : MehTree = None, tab : int = 10) -> str:
+        built_tree = ""
+        # Leaves and branches and those pointy thingies, basically the top of the tree
+        for x in range(tab): built_tree += " "*(tab-x) + "*"*(x) + "*"*(x-1) + "\n"
+        # Log, trunk, idk what was the word in english lol
+        for x in range(int(tab/4)): built_tree += " "*(tab-1) + "*\n"
+        # Print the whole super cool and complex tree...
+        return built_tree
+
+    def __init__(self, tab : int = 10) -> None:
+        self.to_print = self.make_tree(tab)
+
+    def print_tree(self) -> None:
+        for x in self.to_print:
+            print(x, end="")
+            sleep(((1/1)/(fps if fps > 100 else 100)) if not test_path else 0)
 
 
 
-class UrsinaUltimateTree():
-    def update():
-        global counter
-        counter +=1
-        random.choice(g_lights).scale = 0 + 4 * u.sin(counter * 0.005)
-        random.choice(g_spheres).scale = 0 + 1 * u.sin(counter * 0.005)
-
-    def make_ursina_arrows(self):
-        arrow_x = u.Entity(model="arrow", color=u.color.red, x=0.5)
-        arrow_y = u.Entity(model="arrow", color=u.color.blue, rotation_z=-90, y=0.5)
-        arrow_z = u.Entity(model="arrow", color=u.color.green, rotation_y=90, z=-0.5)
-
-    def tree_cone(self, rad : float, y : int = 0):
-        return u.Entity(model=u.Cone(resolution=curve_res, height=rad*1.5, radius=rad), color=colors.dark_chrimu_green, y=y, 
-        texture="grass", shader=lit_with_shadows_shader)
-
-    def chrimu_sfir(self, color = None, pos : List[int] = None, **kwargs):
-        if pos:
-            if len(pos) < 3: raise IndexError("`pos` arg is missing some coords, broudy")
-            x = pos[0]
-            y = pos[1]
-            z = pos[2]
-        else: x,y,z = 0,0,0
-        return u.Entity(model="sphere", color=color if color else myColors.angy_red, x=x, y=y, z=z, alpha=.5,shader=lit_with_shadows_shader, **kwargs)
-
-
-    async def ursina_tree(self):
-        global tree_levels
-        global app
-        global curve_res
-        curve_res = 400
-        app = u.Ursina()
-
-        self.make_ursina_arrows()
-        log = u.Entity(model=u.Cylinder(resolution=curve_res, radius=.5, start=0, height=5.6, direction=(0,1,0)#)) I tested and fixed a bug in ursina's repo while doing this part LOL
-        , color_gradient=[colors.brown_likea_tree]), shader=lit_with_shadows_shader)
-        log_top = u.Entity(model=u.Cylinder(resolution=curve_res, radius=1, start=5.4, height=5.6, direction=(0,1,0)
-        , color_gradient=[colors.brown_likea_tree]), shader=lit_with_shadows_shader)
-
-        tree_bot = 0
-        new_y = 30
-        base_size = 0.5
-        reduction_cons = 1
-        tree_levels = []
-        while new_y >= tree_bot:
-            temp_cone = self.tree_cone(rad=base_size, y=new_y)
-            temp_cone.radius = base_size
-            temp_cone.rad = temp_cone.radius # in case i wanna call it this way, ok? ok
-            tree_levels.append(temp_cone)
-            new_y = new_y - base_size
-            base_size = base_size + reduction_cons
-        rounds = 8
-        tree_levels.reverse()
-        for w in range(rounds):
-            for i, l in enumerate(tree_levels):
-                if i>=len(tree_levels)-2: break
-                circ = Utils.circle_coords(l.x,l.z,l.radius)
-                limit = (len(circ)-1)
-                followup = True
-                if (i >= len(tree_levels)-3):
-                    odds = [True]
-                    for _a_ in (range(i-3) if i>3 else range(i)): odds.append(False)
-                    # print(odds)
-                    followup = random.choice(odds)
-                if followup:
-                    def delimit(val : int) -> int: return val if val < limit else val-limit
-                    val = int(w*(limit/rounds))+((1+limit%20)*i)
-                    poper = delimit(val)
-                    x, z = circ[poper]
-                    sph_color = random.choice(colors.merry_chrisis_sphere_choices)
-                    # lait = u.PointLight(x=x,y=l.y, z=z, color = sph_color*.5,
-                    # shadows=True)
-                    lait = u.Entity(model='quad', texture='radial_gradient', x=x, y=l.y, z=z, 
-                                    billboard=True, color=sph_color, render_queue=1, alpha=.5)
-                    sfir = self.chrimu_sfir(pos=[x,l.y,z], color = sph_color)
-                    sfir.rad = 1
-                    g_lights.append(lait)
-                    g_spheres.append(sfir)
-
-        # Real Scene
-        ground = u.Entity(model='plane', scale=64, texture='grass', color=u.color.gray, texture_scale=(32,32), collider='box', shader=lit_with_shadows_shader)
-        # sky = u.Sky(texture="sky_sunset")
-        ed = u.EditorCamera()
-        ed.y = ed.y+10
-        # ed.z = ed.z-200
-        app.run()
+async def run_tasks():
+    await asyncio.gather(SimpleTree.vpy_tree(),
+                        return_exceptions=True)
 
 if __name__ == "__main__":
     try:
@@ -368,11 +384,14 @@ if __name__ == "__main__":
     
     HyperComplex = SuperAwesomeAndComplexTree()
     SimpleTree = MehTree()
+    Meeeeh = UrsinaUltimateTree()
     HyperComplex.make_tree()
-    
-    if not test_path: input("\nDid you like it? I guess it missed some lights and decoration, let's do this again...")
 
-    SimpleTree.new_learn()
+    if not test_path:
+        HyperComplex.print_tree()
+        input("\nDid you like it? I guess it missed some lights and decoration, let's do this again...")
+
+    asyncio.run(run_tasks())
 
     # I don't wanna go, Mr Stark
     while True: rate(10)
