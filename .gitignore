@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 *.mp3
 *.wav
+icon.*
