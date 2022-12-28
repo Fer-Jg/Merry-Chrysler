@@ -1,13 +1,39 @@
 **Programmed in Windows 10 environment**
 
-Important disclaimer: There might be a "python stopped working" thing at some point, it is normal since
-I could not figure out how to run two processes (you'll understand in a minute) at the same time.
+__Disclaimers__
 
+**About "python stopped working"**
+
+There might be a "python stopped working" thing at some point, it is normal since
+I could not figure out how to run two processes (you'll understand in a minute) at the same time.
 The "stopped working" warning will go away by itself 
 after you give your input in console as asked by the program.
 
+**About FPS**
+You can change the web's animation FPS using `fps` global variable in the code, sadly I did not have
+time to figure a better way to implement this since it was actually one of the first things I did
+but ended changing up a lot due to newer implementations
 
-How to use:
+
+**About downloads**
+
+There will be files downloaded for experience's sake, it will be 1 mp3 
+(which will be modified and splitted into a total of 3 sound files) and 1 png 
+(which will be duplicated into a ico file)
+
+
+**About possible Exceptions/Errors**
+ICON: There might be an error with the icon saying that the ico could not be loaded, if that is the case just change the global
+flag `use_ico` to False and it should be fixed on the next run.
+
+MUSIC: The same as the icon, the music will be downloaded, converted and cropped to give a better experience, if for some reason
+the music gives an exception or provokes an issue with the experience, it can also be turned off with the global flag
+`use_music`
+
+
+
+
+__How To Use__
 
 1.- Run the program and follow console instructions
 2.- The program will open your web browser, go enjoy some christmas there c:
