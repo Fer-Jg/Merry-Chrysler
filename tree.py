@@ -12,8 +12,9 @@ from os import getcwd as mypath
 
 import asyncio
 from typing import List
-import ursina as u
+import ursina as u  
 from ursina.shaders import lit_with_shadows_shader
+from ursina.prefabs.first_person_controller import FirstPersonController as FPC
 
 
 import subprocess
@@ -24,6 +25,8 @@ from requests import get as gimmeMyRequest
 global test_path
 test_path = mypath().lower().startswith("C:\\Users\\inicio".lower())
 global fps
+global use_ico
+use_ico = True
 fps = 60
 
 global res_w
@@ -41,8 +44,6 @@ icon_file = "icon.ico"
 global bg_music_name
 global bg_music
 bg_music_name = "Best_Chrimu_Song.mp3"
-global ursified
-ursified = False
 
 step = 0
 items = []
@@ -72,7 +73,6 @@ global colors
 colors = myColors()
 
 class Utils():
-
     @staticmethod
     def circle_coords(origin_x:int, origin_y:int, radius:int, stepSize:float = 0.1):
         positions = []
@@ -84,45 +84,53 @@ class Utils():
 
 
 # Ursina Stuff
+global main_camera
+global player
+
 # Ursina updates
 def update():
-    if ursified:
-        global counter
-        counter +=1
-        random.choice(g_lights).scale = 0 + 4 * u.sin(counter * 0.005)
-        random.choice(g_spheres).scale = 0 + 1 * u.sin(counter * 0.005)
+    global counter
+    if main_camera.enabled:
+        rotation_info.text = str(int(main_camera.rotation_x)) + ', ' + str(int(main_camera.rotation_y))
+    if player.enabled:
+        rotation_info.text = str(int(player.rotation_x)) + ', ' + str(int(player.rotation_y))
+    counter +=1
+    random.choice(g_lights).scale = 0 + 4 * u.sin(counter * 0.005)
+    random.choice(g_spheres).scale = 0 + 1 * u.sin(counter * 0.005)
 
-def exCiting():
-    print("Bye bye")
+def input(key):
+    if key == 'tab':    # press tab to toggle edit/play mode
+        main_camera.enabled = not main_camera.enabled
+        player.enabled = not player.enabled
 
 class UrsinaUltimateTree():
     def download_music(self):
         global bg_music_name
-        bg_music_name = "Best_Chrimu_Song.mp3"
-        
-        download_stuff = not path.exists(bg_music_name)
-        # If there is no mp3 file we should just avoid requests and other processes, right?
-        print("Getting the most Chrismas-y song an AI could find...")
-        if download_stuff:
-            url = "https://cdn.trendybeatz.com/audio/Mariah-Carey-All-I-Want-For-Christmas-Is-You-(TrendyBeatz.com).mp3"
-            download = gimmeMyRequest(url)
-        
+        temp_bg_music_name = "Best_Chrimu_Song.mp3"
         # All utility names
-        initial_output_name = "fix_" + bg_music_name.replace(".mp3",".wav")
+        initial_output_name = "fix_" + temp_bg_music_name.replace(".mp3",".wav")
         fixed_output_name = initial_output_name.replace("fix_","")
         bg_music_name = fixed_output_name
-
-        # Actually download the song, but in a mp3 format, so let's fix that later...
+        
+        download_stuff = not path.exists(bg_music_name) and not path.exists(bg_music_name)
+        # If there is no mp3 file we should just avoid requests and other processes, right?
         if download_stuff:
-            with open(bg_music_name, "wb") as f:    f.write(download.content)
+            print("Getting the most Chrismas-y song an AI could find...")
+            url = "https://cdn.trendybeatz.com/audio/Mariah-Carey-All-I-Want-For-Christmas-Is-You-(TrendyBeatz.com).mp3"
+            download = gimmeMyRequest(url)
+
+        # Actually save the song, but in a mp3 format, so let's fix that later...
+        if download_stuff:
+            with open(temp_bg_music_name, "wb") as f:    f.write(download.content)
 
         # Make song a wav file
-        subprocess.run(['ffmpeg', '-y', '-i', bg_music_name, initial_output_name], 
+        subprocess.run(['ffmpeg', '-y', '-i', temp_bg_music_name, initial_output_name], 
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         # Cut the wav file from the first 7.5 seconds because the download site has some annoying ad through that bit
         subprocess.run(['ffmpeg', '-y', '-i', initial_output_name, '-ss', '00:00:07.5', '-c', 'copy', fixed_output_name], 
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    
+        print("Deleting temp files...")
+        
     def download_icon(self):
         download_stuff = not path.exists(icon_file)
         
@@ -133,11 +141,10 @@ class UrsinaUltimateTree():
             with open(icon_file, "wb") as file:
                 file.write(req.content)
         icoed_icon = icon_file.replace(".png",".ico")
-        print(f"{icoed_icon} {not path.exists(icoed_icon)}")
         if not path.exists(icoed_icon):
             subprocess.run(['convert', icon_file, icoed_icon])
 
-    def play_music(self):
+    def setup_music(self):
         global bg_music_name
         global bg_music
         bg_music = u.Audio(
@@ -149,8 +156,7 @@ class UrsinaUltimateTree():
 
     def setSystemIcon(self):
         self.download_icon()
-        u.window.icon = icon_file
-
+        if use_ico: u.window.icon = icon_file
 
     def setAppData(self):
         self.download_music()
@@ -159,11 +165,13 @@ class UrsinaUltimateTree():
         
     def __init__(self) -> None:
         global app
-
         self.setAppData()
-        app = u.Ursina(development_mode=not test_path, fullscreen=False, borderless = False)
-        u.window.exit_button.visible = True
-        u.window.exit_button.on_click = exCiting
+
+    async def start(self):
+        u.window.windowed_size = u.Vec2(res_w*.5, res_h*.5)
+        app = u.Ursina(development_mode= not test_path, fullscreen=False, borderless = False)
+        u.window.windowed_size = u.Vec2(res_w*.5, res_h*.5)
+        await self.plant_tree()
 
     def make_ursina_arrows(self):
         arrow_x = u.Entity(model="arrow", color=u.color.red, x=0.5)
@@ -184,18 +192,15 @@ class UrsinaUltimateTree():
         return u.Entity(model="sphere", color=color if color else myColors.angy_red, x=x, y=y, z=z, alpha=.5,shader=lit_with_shadows_shader, **kwargs)
 
 
-    async def ursina_tree(self):
-        global test_path
-        global step
+    async def plant_tree(self):
         global tree_levels
         global app
         global curve_res
         curve_res = 400
-        
-        while step < 2: print("Waiting for step...")
 
         if test_path: self.make_ursina_arrows()
-        log = u.Entity(model=u.Cylinder(resolution=curve_res, radius=.5, start=0, height=5.6, direction=(0,1,0)#)) I tested and fixed a bug in ursina's repo while doing this part LOL
+        log = u.Entity(model=u.Cylinder(resolution=curve_res, radius=.5, start=0, height=5.6, direction=(0,1,0)
+        #)) I tested and fixed a bug in ursina's repo while doing this part LOL
         , color_gradient=[colors.brown_likea_tree]), shader=lit_with_shadows_shader)
         log_top = u.Entity(model=u.Cylinder(resolution=curve_res, radius=1, start=5.4, height=5.6, direction=(0,1,0)
         , color_gradient=[colors.brown_likea_tree]), shader=lit_with_shadows_shader)
@@ -242,13 +247,19 @@ class UrsinaUltimateTree():
 
         # Real Scene
         ground = u.Entity(model='plane', scale=64, texture='grass', color=u.color.gray, texture_scale=(32,32), collider='box', shader=lit_with_shadows_shader)
+        wall1 = u.Entity(model='cube', origin_x=-32, origin_z=-32, origin_y=0, scale_x=64)
         # sky = u.Sky(texture="sky_sunset")
-        ed = u.EditorCamera()
-        ed.y = ed.y+10
-        ed.z = ed.z-30
-        ed.look_at(ground)
+        global main_camera, player
+        main_camera = u.EditorCamera()
+        main_camera.y = main_camera.y+15
+        main_camera.z = main_camera.z-20
+        main_camera.enabled = False
+        global rotation_info
+        rotation_info = u.Text(position=u.window.top_left)
+
+        player = FPC(y=2, enabled=True)
         # ed.z = ed.z-200
-        self.play_music()
+        self.setup_music()
         app.run(info=False)
 
 
@@ -275,7 +286,8 @@ class MehTree():
     def __init__(self, previous : UrsinaUltimateTree = None) -> None:
         global res_w
         global res_h
-        self.ursina = False
+        self.previous = previous
+
         origin_w = int(self.get_curr_screen_geometry().split("x")[0])
         origin_h = int(self.get_curr_screen_geometry().split("x")[1].split("+")[0])
         res_w = origin_w * 0.60
@@ -431,22 +443,13 @@ class MehTree():
                 ndot = points(pos=[vector(x,pos_y,z)], radius=0.3, size_units="world", color=set_color)
                 dot_levels.append(ndot)
         itera = 0
-        global step
         print("\n\nNow look at your web browser ;)")
-        ursination = UrsinaUltimateTree()
+        ursed = False
         while True:
             rate(fps)
-            # # scene.pause()
-            # light_levels[itera].visible = not light_levels[itera].visible
-            # dot_levels[itera].modify(0,visible = not dot_levels[itera].visible)
-            # print(light_levels[itera].visible)
-            # itera = itera+1 if itera+1 < len(light_levels)-1 else 0
-            # # scene.pause()
-            if step < 2:
+            if not ursed:
                 input("Done? Press enter")
-                step = 2
-                ursified = True
-                await ursination.ursina_tree()
+                await self.previous.start()
 
 class SuperAwesomeAndComplexTree():
 
@@ -471,6 +474,7 @@ class SuperAwesomeAndComplexTree():
 
 async def run_tasks():
     await asyncio.gather(SimpleTree.vpy_tree(),
+                        UrsinaUltimateTree.start(),
                         return_exceptions=True)
 
 if __name__ == "__main__":
