@@ -8,6 +8,7 @@ from re import DOTALL as DoItCool
 from time import sleep
 from tkinter import Tk
 from os import getcwd as mypath
+from os import system as CMD
 
 
 import asyncio
@@ -446,6 +447,8 @@ class MehTree():
             rate(fps)
             if not ursed:
                 input("Done? Press enter")
+                CMD("PAUSE")
+
                 ursed = True
                 await ursination.plant_tree()
 
