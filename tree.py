@@ -481,11 +481,7 @@ async def run_tasks():
                         return_exceptions=True)
 
 if __name__ == "__main__":
-    try:
-        fps = int(input("How many FPS should I try to run at? (must be int): ")) if not test_path else fps
-    except:
-        fps = 60
-        print(f"There was an error with your FPS input (wrong input type?), so I will just use {fps} FPS, GLFH :D")
+    print(f"Running program @ {fps} FPS")
     
     HyperComplex = SuperAwesomeAndComplexTree()
     SimpleTree = MehTree()
