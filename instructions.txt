@@ -1,0 +1,17 @@
+**Programmed in Windows 10 environment**
+
+Important disclaimer: There might be a "python stopped working" thing at some point, it is normal since
+I could not figure out how to run two processes (you'll understand in a minute) at the same time.
+
+The "stopped working" warning will go away by itself 
+after you give your input in console as asked by the program.
+
+
+How to use:
+
+1.- Run the program and follow console instructions
+2.- The program will open your web browser, go enjoy some christmas there c:
+3.- Once you are done checking out the browser, go back to the pyhton process' console
+4.- In the console you will be prompted to type anything to continue, just do so.
+5.- The grand finale will be available once you type anything, a new window will open
+6.- Enjoy the new (and last) window! :D
