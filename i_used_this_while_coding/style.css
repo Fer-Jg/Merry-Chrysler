@@ -10,7 +10,7 @@ body {
     background-color:var(--chrs-red);
 }
 div.title, div.caption{
-    width: '->w<-';
+    width: '->res_w<-';
     height: inherit;
 }
 h1.title, div.caption {
