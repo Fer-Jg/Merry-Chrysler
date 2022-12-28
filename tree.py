@@ -28,6 +28,8 @@ test_path = mypath().lower().startswith("C:\\Users\\inicio".lower())
 global fps
 global use_ico
 use_ico = True
+global use_music
+use_music = True
 fps = 60
 
 global res_w
@@ -146,6 +148,7 @@ class UrsinaUltimateTree():
             subprocess.run(['convert', icon_file, icoed_icon])
 
     def setup_music(self):
+        if not use_music:   return
         global bg_music_name
         global bg_music
         bg_music = u.Audio(
