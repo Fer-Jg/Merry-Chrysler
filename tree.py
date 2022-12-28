@@ -166,12 +166,7 @@ class UrsinaUltimateTree():
     def __init__(self) -> None:
         global app
         self.setAppData()
-
-    async def start(self):
-        u.window.windowed_size = u.Vec2(res_w*.5, res_h*.5)
-        app = u.Ursina(development_mode= not test_path, fullscreen=False, borderless = False)
-        u.window.windowed_size = u.Vec2(res_w*.5, res_h*.5)
-        await self.plant_tree()
+        app = u.Ursina(development_mode=not test_path, fullscreen=False, borderless = False)
 
     def make_ursina_arrows(self):
         arrow_x = u.Entity(model="arrow", color=u.color.red, x=0.5)
@@ -193,6 +188,8 @@ class UrsinaUltimateTree():
 
 
     async def plant_tree(self):
+        global test_path
+        global step
         global tree_levels
         global app
         global curve_res
@@ -286,8 +283,7 @@ class MehTree():
     def __init__(self, previous : UrsinaUltimateTree = None) -> None:
         global res_w
         global res_h
-        self.previous = previous
-
+        self.ursina = False
         origin_w = int(self.get_curr_screen_geometry().split("x")[0])
         origin_h = int(self.get_curr_screen_geometry().split("x")[1].split("+")[0])
         res_w = origin_w * 0.60
@@ -445,11 +441,13 @@ class MehTree():
         itera = 0
         print("\n\nNow look at your web browser ;)")
         ursed = False
+        ursination = UrsinaUltimateTree()
         while True:
             rate(fps)
             if not ursed:
                 input("Done? Press enter")
-                await self.previous.start()
+                ursed = True
+                await ursination.plant_tree()
 
 class SuperAwesomeAndComplexTree():
 
@@ -474,7 +472,6 @@ class SuperAwesomeAndComplexTree():
 
 async def run_tasks():
     await asyncio.gather(SimpleTree.vpy_tree(),
-                        UrsinaUltimateTree.start(),
                         return_exceptions=True)
 
 if __name__ == "__main__":
