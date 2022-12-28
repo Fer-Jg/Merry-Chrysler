@@ -1,5 +1,11 @@
 from vpython import *
+import ursina as u  
+from ursina.shaders import lit_with_shadows_shader
+from ursina.prefabs.first_person_controller import FirstPersonController as FPC
+from requests import get as gimmeMyRequest
 
+from typing import List
+import asyncio
 import random
 import math
 from re import sub as regex_change
@@ -9,18 +15,12 @@ from time import sleep
 from tkinter import Tk
 from os import getcwd as mypath
 from os import system as CMD
-
-
-import asyncio
-from typing import List
-import ursina as u  
-from ursina.shaders import lit_with_shadows_shader
-from ursina.prefabs.first_person_controller import FirstPersonController as FPC
-
-
-import subprocess
 from os import path
-from requests import get as gimmeMyRequest
+import subprocess
+
+
+
+
 
 # I don't want to input my FPS every time I test my program so I do this for later use (:
 global test_path
