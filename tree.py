@@ -26,11 +26,11 @@ import subprocess
 global test_path
 test_path = mypath().lower().startswith("C:\\Users\\inicio".lower())
 global fps
+fps = 60
 global use_ico
 use_ico = True
 global use_music
 use_music = True
-fps = 60
 
 global res_w
 global res_h
@@ -261,6 +261,7 @@ class UrsinaUltimateTree():
         player = FPC(y=2, enabled=True)
         # ed.z = ed.z-200
         self.setup_music()
+        app.fps = fps
         app.run(info=False)
 
 
